@@ -95,7 +95,7 @@ server = http.createServer(app).listen(app.get('port'),() ->
 	else
 		console.log("Start your slideshow by going to http://#{ip}:#{app.get('port')} on your browsers computer")
 
-	console.log("Then point your phone to http://#{ip}:#{app.get('port')}/phone")
+	console.log("Point your phone to http://#{ip}:#{app.get('port')}/phone")
 )
 
 # Set up sockets...
