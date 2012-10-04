@@ -31,15 +31,6 @@ app.get('/js/slide_controller.js',(req,res) ->
 	)
 )
 
-customReveal = (req,res) ->
-	fs.readFile("#{__dirname}/lib/reveal.js",'utf8',(err,content) ->
-		res.writeHeader(200)
-		res.end(content)
-	)
-
-app.get('*/reveal.js',customReveal)
-app.get('*/reveal.min.js',customReveal)
-
 dir = optimist.argv._[0]
 base_path = '' if dir.charAt(0) == "/" 
 index = optimist.argv['index']||'index.html'
@@ -120,6 +111,7 @@ io.sockets.on('connection', (socket) ->
 
 				socket.on("tell_browser#{app_id}", ((aid,sock) ->
 					(data) ->
+						console.log('telling browser',data)
 						sock.emit("reveal_navigate#{aid}",data)
 				)(app_id,sock))
 		else

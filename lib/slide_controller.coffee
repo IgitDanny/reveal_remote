@@ -10,11 +10,9 @@ setup = () ->
 		app_id = data['app_id'] unless(app_id)
 		upgradeNav = () ->
 			if Reveal and Reveal.navigateNext
-				for direction in ["Left","Right","Up","Down","Prev","Next"]
-					document.addEventListener("navigate#{direction}",((d) ->
-						return () ->
-							socket.emit("tell_browser#{app_id}",{direction:d})
-					)(direction))
+				document.addEventListener("slidechanged",() ->
+					socket.emit("tell_browser#{app_id}",Reveal.getIndices())
+				)
 			else
 				# Keep waiting until Reveal is setup
 				setTimeout(upgradeNav,200)

@@ -9,15 +9,7 @@ setup = () ->
 		app_id = data['app_id'] unless(app_id)
 
 		socket.on("reveal_navigate#{app_id}",(data) ->
-			console.log('got message',data['direction'].toLowerCase())
-			switch data['direction'].toLowerCase()
-				when "left" then Reveal.navigateLeft()
-				when "right" then Reveal.navigateRight()
-				when "up" then Reveal.navigateUp()
-				when "down" then Reveal.navigateDown()
-				when "prev" then Reveal.navigatePrev()
-				when "next" then Reveal.navigateNext()
-				else console.log('invalid instruction'))
+			Reveal.navigateTo(data.h,data.v))
 	)
 
 document.addEventListener("DOMContentLoaded",setup)
