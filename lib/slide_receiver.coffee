@@ -1,10 +1,9 @@
 socket = io.connect("http://#{window.location.hostname}")
-phone = navigator.userAgent.match(/iPhone/)
 app_id = null
 
 setup = () ->
 	socket.on('startup',(data) ->
-		socket.emit('init',{phone:phone}))
+		socket.emit('init',{phone:false}))
 
 	socket.on('app_id',(data) ->
 		app_id = data['app_id'] unless(app_id)
