@@ -1,0 +1,27 @@
+{
+  "name": "reveal_remote",
+  "version": "0.0.0",
+  "description": "A means of controlling a reveal.js presentation from your phone with websockets",
+  "main": "index.js",
+	"bin": {
+		"reveal_remote": "./bin/reveal_remote.js"
+	},
+  "dependencies": {
+    "express": "3.0.0rc4",
+    "socket.io": "~0.9.10",
+		"optimist": "0.3.4",
+    "typescript": "~0.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "reveal_remote test_presentation"
+  },
+  "repository": "",
+  "keywords": [
+    "reveal.js",
+    "nodejs",
+    "socket.io"
+  ],
+  "author": "Ryan Swanson",
+  "license": "BSD"
+}
