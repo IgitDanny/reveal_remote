@@ -13,7 +13,12 @@ npm install
 # How to Use (locally)
 ```$
 coffee index.coffee /path/to/presentation
-Point your phone to http://{ip_address}:4101/phone
+Point your controlling browser to http://{ip_address}:4101/controller
+```
+-  or
+```$
+node index /path/to/presenation
+Point your controlling browser to http://{ip_address}:4101/controller
 ```
 
 # How to Install (when I get it published)
@@ -24,7 +29,7 @@ npm install -g reveal_remote
 # How to Use
 ```$
 reveal_remote my_presentation/
-Point your phone to http://{ip_address}:4101/phone
+Point your controlling browser to http://{ip_address}:4101/controller
 ```
 
 # Todo
