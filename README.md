@@ -28,6 +28,5 @@ Point your phone to http://{ip_address}:4101/phone
 ```
 
 # Todo
--Sync the presentations.  In the event you do something on the receiver the slides will be out of sync, there should be periodic syncing.
--See if I can get away without bundling reveal.js with my custom events.
+-  Add controller end stuff, like a timer, and/or notes.  Yes I know there's a presenter notes plugin...
 
