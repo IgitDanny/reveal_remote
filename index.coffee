@@ -17,15 +17,8 @@ for iface of ifaces
 app = express() 
 app.set('port',4101)
 
-app.get('/js/slide_receiver.js',(req,res) ->
-	fs.readFile("#{__dirname}/lib/slide_receiver.js",(err,content)->
-		res.writeHeader(200)
-		res.end(content)
-	)
-)
-
-app.get('/js/slide_controller.js',(req,res) ->
-	fs.readFile("#{__dirname}/lib/slide_controller.js",'utf8',(err,content)->
+app.get('/js/reveal_remote.js',(req,res) ->
+	fs.readFile("#{__dirname}/lib/reveal_remote.js",'utf8',(err,content)->
 		res.writeHeader(200)
 		res.end(content.replace(/__hostname__/,"#{ip}:#{app.get('port')}"))
 	)
@@ -34,8 +27,8 @@ app.get('/js/slide_controller.js',(req,res) ->
 dir = optimist.argv._[0]
 base_path = '' if dir.charAt(0) == "/" 
 index = optimist.argv['index']||'index.html'
-browser_slides = ''
-phone_slides = ''
+receiver_slides = ''
+controller_slides = ''
 
 inject_scripts = (html,sname) ->
 	[top,bottom] = html.split('</head>')
@@ -43,19 +36,19 @@ inject_scripts = (html,sname) ->
 	top += "<script type='text/javascript' src='/js/#{sname}.js'></script>"
 	[top,bottom].join('\n</head>')
 
-browser_inject = (err,html) ->
-	browser_slides = inject_scripts(html,'slide_receiver')
+receiver_inject = (err,html) ->
+	receiver_slides = inject_scripts(html,'reveal_remote')
 
-phone_inject = (err,html) ->
-	phone_slides = inject_scripts(html,'slide_controller')
+controller_inject = (err,html) ->
+	controller_slides = inject_scripts(html,'reveal_remote')
 
 # Go through the supplied directory and use all of its resource directories
 # like css,js,lib...
 fs.readdir(dir,(err,list) ->
 	list.forEach((file) ->
 		if file == index
-			fs.readFile("#{base_path}/#{dir}/#{file}",'utf8',browser_inject)
-			fs.readFile("#{base_path}/#{dir}/#{file}",'utf8',phone_inject)
+			fs.readFile("#{base_path}/#{dir}/#{file}",'utf8',receiver_inject)
+			fs.readFile("#{base_path}/#{dir}/#{file}",'utf8',controller_inject)
 		fs.stat("#{base_path}#{dir}/#{file}", (err,stat) ->
 			if stat && stat.isDirectory()
 				console.log("found #{base_path}#{dir}/#{file}")
@@ -67,12 +60,12 @@ fs.readdir(dir,(err,list) ->
 
 app.get('/',(req,res) ->
 	res.writeHeader(200)
-	res.end(browser_slides)
+	res.end(receiver_slides)
 )
 
-app.get('/phone',(req,res) ->
+app.get('/controller',(req,res) ->
 	res.writeHeader(200)
-	res.end(phone_slides)
+	res.end(controller_slides)
 )
 
 # Ok, startup!
@@ -86,7 +79,7 @@ server = http.createServer(app).listen(app.get('port'),() ->
 	else
 		console.log("Start your slideshow by going to http://#{ip}:#{app.get('port')} on your browsers computer")
 
-	console.log("Point your phone to http://#{ip}:#{app.get('port')}/phone")
+	console.log("Point your controller to http://#{ip}:#{app.get('port')}/controller")
 )
 
 # Set up sockets...
@@ -95,30 +88,30 @@ io = require('socket.io').listen(server)
 
 app_id = null
 remote_map = {}
+
+rnav = (aid,sock) ->
+	(data) ->
+		sock.emit("reveal_navigate#{aid}",data)
+
 io.sockets.on('connection', (socket) ->
 	socket.emit('startup')
 	# Tell the client to "init" and the client will
-	#   (if it's a browser) send back an app_id
-	#   (if it's a phone) hook up with a browser if there's an app_id, or do nothing 
-	socket.on('init',(data) ->
-		if data.phone
-			if app_id
-				remote_map[app_id]['phone'] = socket
-				socket.app_id = app_id
-				socket.emit('app_id',{app_id: app_id})
+	#   (if it's a receiver) send back an app_id
+	#   (if it's a controller) hook up with a receiver if there's an app_id, or do nothing 
+	socket.on('init',() ->
+		if app_id
+			socket.emit('app_id',{app_id: app_id})
 
-				sock = remote_map[app_id]['computer']
+			sock = remote_map[app_id]
 
-				socket.on("tell_browser#{app_id}", ((aid,sock) ->
-					(data) ->
-						console.log('telling browser',data)
-						sock.emit("reveal_navigate#{aid}",data)
-				)(app_id,sock))
+			socket.on("tell_#{app_id}",rnav(app_id,sock))
+			sock.on("tell_#{app_id}",rnav(app_id,socket))
+			app_id = null
 		else
 			app_id = parseInt(Math.random(100) * 1000,10)
-			remote_map[app_id] = {computer:null,phone:null}
-			socket.app_id = app_id
+			remote_map[app_id] = {}
 
-			# Tell the browser what it's app_id is
+			# Tell the receiver what it's app_id is
 			socket.emit('app_id',{app_id:app_id})
-			remote_map[app_id]['computer'] = socket))
+			remote_map[app_id] = socket
+	))
