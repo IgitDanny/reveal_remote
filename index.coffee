@@ -15,7 +15,7 @@ for iface of ifaces
 	)
 
 app = express() 
-app.set('port',4101)
+app.set('port',optimist.argv['port']||4101)
 
 app.get('/js/reveal_remote.js',(req,res) ->
 	fs.readFile("#{__dirname}/lib/reveal_remote.js",'utf8',(err,content)->
@@ -79,7 +79,7 @@ server = http.createServer(app).listen(app.get('port'),() ->
 	else
 		console.log("Start your slideshow by going to http://#{ip}:#{app.get('port')} on your browsers computer")
 
-	console.log("Point your controller to http://#{ip}:#{app.get('port')}/controller")
+	console.log("Point your controlling browser to http://#{ip}:#{app.get('port')}/controller")
 )
 
 # Set up sockets...

@@ -11,13 +11,15 @@ npm install
 ```
 
 # How to Use (locally)
-```$
-coffee index.coffee /path/to/presentation
-Point your controlling browser to http://{ip_address}:4101/controller
-```
--  or
+
 ```$
 node index /path/to/presenation
+Point your controlling browser to http://{ip_address}:4101/controller
+```
+## or
+
+```$
+coffee index.coffee /path/to/presentation
 Point your controlling browser to http://{ip_address}:4101/controller
 ```
 
