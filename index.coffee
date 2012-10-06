@@ -57,7 +57,6 @@ fs.readdir(dir,(err,list) ->
 	)
 )
 
-
 app.get('/',(req,res) ->
 	res.writeHeader(200)
 	res.end(receiver_slides)
@@ -68,7 +67,6 @@ app.get('/controller',(req,res) ->
 	res.end(controller_slides)
 )
 
-# Ok, startup!
 server = http.createServer(app).listen(app.get('port'),() ->
 	console.log("Server started listening on port #{app.get('port')}\n\n")
 	console.log("-------------------------------------------------------")
@@ -94,24 +92,19 @@ rnav = (aid,sock) ->
 		sock.emit("reveal_navigate#{aid}",data)
 
 io.sockets.on('connection', (socket) ->
-	socket.emit('startup')
-	# Tell the client to "init" and the client will
-	#   (if it's a receiver) send back an app_id
-	#   (if it's a controller) hook up with a receiver if there's an app_id, or do nothing 
-	socket.on('init',() ->
-		if app_id
-			socket.emit('app_id',{app_id: app_id})
+	if app_id
+		socket.emit('init',{app_id: app_id})
 
-			sock = remote_map[app_id]
+		sock = remote_map[app_id]
 
-			socket.on("tell_#{app_id}",rnav(app_id,sock))
-			sock.on("tell_#{app_id}",rnav(app_id,socket))
-			app_id = null
-		else
-			app_id = parseInt(Math.random(100) * 1000,10)
-			remote_map[app_id] = {}
+		socket.on("tell_#{app_id}",rnav(app_id,sock))
+		sock.on("tell_#{app_id}",rnav(app_id,socket))
+		app_id = null
+	else
+		app_id = parseInt(Math.random(100) * 1000,10)
+		remote_map[app_id] = {}
 
-			# Tell the receiver what it's app_id is
-			socket.emit('app_id',{app_id:app_id})
-			remote_map[app_id] = socket
-	))
+		# Tell the receiver what it's app_id is
+		socket.emit('init',{app_id:app_id})
+		remote_map[app_id] = socket
+)
