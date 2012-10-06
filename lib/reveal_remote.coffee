@@ -11,7 +11,6 @@ setup = () ->
 			Reveal.navigateTo(data.h,data.v))
 	
 		document.addEventListener("slidechanged",() ->
-			console.log('blah')
 			socket.emit("tell_#{app_id}",Reveal.getIndices()) unless from_socket
 			from_socket = false
 		)
