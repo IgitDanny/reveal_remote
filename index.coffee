@@ -24,23 +24,34 @@ app.get('/js/reveal_remote.js',(req,res) ->
 	)
 )
 
+app.use('/js',express.static("#{__dirname}/lib"))
+app.use('/css',express.static("#{__dirname}/css"))
+
 dir = optimist.argv._[0]
 base_path = '' if dir.charAt(0) == "/" 
 index = optimist.argv['index']||'index.html'
 receiver_slides = ''
 controller_slides = ''
 
-inject_scripts = (html,sname) ->
+inject_scripts = (html,scripts...) ->
 	[top,bottom] = html.split('</head>')
 	top += '<script type="text/javascript" src="/socket.io/socket.io.js"></script>'
-	top += "<script type='text/javascript' src='/js/#{sname}.js'></script>"
+	for sname in scripts 
+		top += "<script type='text/javascript' src='/js/#{sname}.js'></script>"
+	[top,bottom].join('\n</head>')
+	
+inject_style = (html,styles...) ->
+	[top,bottom] = html.split('</head>')
+	for sname in styles
+		top += "<link rel='stylesheet' href='/css/#{sname}.css'/>"
 	[top,bottom].join('\n</head>')
 
 receiver_inject = (err,html) ->
 	receiver_slides = inject_scripts(html,'reveal_remote')
 
 controller_inject = (err,html) ->
-	controller_slides = inject_scripts(html,'reveal_remote')
+	controller_slides = inject_scripts(html,'reveal_remote','timer')
+	controller_slides = inject_style(controller_slides,'rr')
 
 # Go through the supplied directory and use all of its resource directories
 # like css,js,lib...
