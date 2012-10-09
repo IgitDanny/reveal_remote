@@ -14,24 +14,13 @@ npm install
 
 ```$
 node index /path/to/presenation
-Point your controlling browser to http://{ip_address}:4101/controller
+Point your controlling browser to http://{ip_address}:{port}/controller
 ```
 ## or
 
 ```$
 coffee index.coffee /path/to/presentation
-Point your controlling browser to http://{ip_address}:4101/controller
-```
-
-# How to Install (when I get it published)
-```$
-npm install -g reveal_remote
-```
-
-# How to Use
-```$
-reveal_remote my_presentation/
-Point your controlling browser to http://{ip_address}:4101/controller
+Point your controlling browser to http://{ip_address}:{port}/controller
 ```
 
 # Todo
